@@ -13,7 +13,7 @@ try:
     connection = postgresql_pool.getconn()
 
     #Автоматическое внесение изменений в БД
-    connection.autocommit = True
+    #connection.autocommit = True
 
     with connection.cursor() as cursor:
         "Создание таблицы работников"
