@@ -58,7 +58,6 @@ try:
             keys = 'id, first_name, last_name, age, department, salary'
             query = f"INSERT INTO employees({keys}) VALUES ({id}, '{first_name}', '{last_name}', {age}, '{department}', {salary});"
             cursor.execute(query, (id, first_name, last_name, age, department, salary))
-
     def get_full_list_employees():
         """
         Печатает список всех сотрудников
@@ -68,9 +67,10 @@ try:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT * 
-                   FROM employees
-                   ORDER BY id;
+                """ 
+                SELECT * 
+                FROM employees
+                ORDER BY id;
                 """)
             print(cursor.fetchall())
 
@@ -80,17 +80,18 @@ try:
 
         Args:
             id(int): уникальный id сотрудника
-            *new_data: пара столбец: значение
+            *new_data: пара 'столбец: значение'
         """
         with connection.cursor() as cursor:
             #Проверка существует ли в БД пользователь с таким id
             cursor.execute(
-               f"""SELECT id
+               f"""
+               SELECT id
                FROM employees
-               WHERE id = {id};"""
+               WHERE id = {id};
+               """
             )
             if cursor.fetchone():
-
                 #Создаем массив, в котором будут списки, состоящие из пар столбец-новое значение
                 new_data = [[pair.split(':')[0].strip(), pair.split(':')[1].strip()] for pair in new_data]
                 for i in range(len(new_data)):
@@ -109,9 +110,11 @@ try:
         with connection.cursor() as cursor:
             #Проверка существует ли в БД пользователь с таким id
             cursor.execute(
-               f"""SELECT id
-               FROM employees
-               WHERE id = {id};"""
+               f"""
+                SELECT id
+                FROM employees
+                WHERE id = {id};
+                """
             )
             if cursor.fetchone():
                 delete = f'DELETE FROM employees WHERE id = {id};'
@@ -119,9 +122,8 @@ try:
             else:
                 print("Сотрудника с таким id не существует")
 
-
 #SELECTS
-    def search_by_name_and_surname(name: str, surname: str ):
+    def search_by_name_and_surname(name: str, surname: str):
         """
         Выводит информацию о сотруднике по имени и фамилии
 
@@ -131,9 +133,11 @@ try:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                f"""SELECT * 
-                   FROM employees
-                   WHERE first_name = '{name}' AND last_name = '{surname}';
+                f"""
+                SELECT * 
+                FROM employees
+                WHERE first_name = '{name}' 
+                AND last_name = '{surname}';
                 """
             )
             print(cursor.fetchall())
@@ -145,15 +149,17 @@ try:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT AVG(salary)
-                   FROM employees;
+                """
+                SELECT AVG(salary)
+                FROM employees;
                 """
             )
             average_salary = cursor.fetchone()[0]
             cursor.execute(
-                f"""SELECT *
-                   FROM employees
-                   WHERE salary > {average_salary};
+                f"""
+                SELECT *
+                FROM employees
+                WHERE salary > {average_salary};
                 """
             )
             print(cursor.fetchall())
@@ -167,15 +173,17 @@ try:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                f"""SELECT *
-                   FROM employees
-                   WHERE department = '{department}';
+                f"""
+                SELECT *
+                FROM employees
+                WHERE department = '{department}';
                 """
             )
             print(cursor.fetchall())
-
     #Отправляем объект соединения в пул соединений
     postgresql_pool.putconn(connection)
+
+
 except Exception as e:
     print(f"Error {e}")
 
