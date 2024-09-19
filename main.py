@@ -25,6 +25,20 @@ try:
                 salary NUMERIC);
             """
         )
+
+        #Индексируем колонку id в таблице employees для увеличения производительности
+        cursor.execute(
+            """CREATE INDEX IF NOT EXISTS index_id 
+               ON employees(id);
+            """
+        )
+        #Индексируем колонки first_name, last_name, department в таблице employees для увеличения производительности
+        cursor.execute(
+            """CREATE INDEX IF NOT EXISTS index_name_surname_department
+               ON employees(first_name, last_name, department);
+            """
+        )
+
     def create_employee(id, first_name, last_name, age, department, salary):
         """
         Добавление нового сотрудника в БД
