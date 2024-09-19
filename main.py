@@ -103,6 +103,59 @@ try:
                 print("Сотрудника с таким id не существует")
 
 
+#SELECTS
+    def search_by_name_and_surname(name: str, surname: str ):
+        """
+        Выводит информацию о сотруднике по имени и фамилии
+
+        Args:
+            name(str): имя сотрудника
+            surname(str): фамилия сотруника
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""SELECT * 
+                   FROM employees
+                   WHERE first_name = '{name}' AND last_name = '{surname}';
+                """
+            )
+            print(cursor.fetchall())
+
+    def search_above_average_salary():
+        """
+        Выводит информацию о сотрудниках, чья зарплата выше среднего
+
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT AVG(salary)
+                   FROM employees;
+                """
+            )
+            average_salary = cursor.fetchone()[0]
+            cursor.execute(
+                f"""SELECT *
+                   FROM employees
+                   WHERE salary > {average_salary};
+                """
+            )
+            print(cursor.fetchall())
+
+    def search_by_department(department: str):
+        """
+        Выводит сотрудников, которые работают в отделе
+
+        Args:
+            department(str): отдел
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""SELECT *
+                   FROM employees
+                   WHERE department = '{department}';
+                """
+            )
+            print(cursor.fetchall())
 
 except Exception as e:
     print(f"Error {e}")
