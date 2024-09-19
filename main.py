@@ -1,14 +1,17 @@
 import psycopg2
-
+from psycopg2 import pool
 
 try:
-    #Подключение к БД, предварительно созданной в SQL Shell
-    connection = psycopg2.connect(
+    #Подключение к БД, предварительно созданной в SQL Shell, и создание пула соединений
+    postgresql_pool = psycopg2.pool.SimpleConnectionPool(1, 20,
         host = '127.0.0.1',
         user = 'postgres',
         password = 'zxcvb',
         database = 'company_db'
     )
+    #Получаем соединение из пула соединений
+    connection = postgresql_pool.getconn()
+
     #Автоматическое внесение изменений в БД
     connection.autocommit = True
 
@@ -171,11 +174,13 @@ try:
             )
             print(cursor.fetchall())
 
+    #Отправляем объект соединения в пул соединений
+    postgresql_pool.putconn(connection)
 except Exception as e:
     print(f"Error {e}")
 
 finally:
-    if connection:
+    if postgresql_pool:
         cursor.close()
-        connection.close()
+        postgresql_pool.closeall()
         print("Connection closed")
