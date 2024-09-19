@@ -49,7 +49,6 @@ try:
         Return:
             list of tuples - список кортежей с данными о сотрудниках
         """
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT * 
@@ -57,7 +56,7 @@ try:
                    ORDER BY id;
                 """)
             print(cursor.fetchall())
-    get_full_list_employees()
+
     def update_data_employee(id, *new_data):
         """
         Обновляет данные сотрудника, принимая на вход его id и новые значения вида 'column: value'
@@ -66,7 +65,6 @@ try:
             id(int): уникальный id сотрудника
             *new_data: пара столбец: значение
         """
-
         with connection.cursor() as cursor:
             #Проверка существует ли в БД пользователь с таким id
             cursor.execute(
@@ -83,6 +81,7 @@ try:
                     cursor.execute(update)
             else:
                 print("Сотрудника с таким id не существует")
+
     def delete_employee(id: int):
         """
         Удаляет сотрудника из БД по его уникальному id
