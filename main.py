@@ -1,4 +1,5 @@
 import psycopg2
+from decimal import Decimal
 from psycopg2 import pool
 
 try:
@@ -29,21 +30,23 @@ try:
             """
         )
 
-        #Индексируем колонку id в таблице employees для увеличения производительности
-        cursor.execute(
-            """CREATE INDEX IF NOT EXISTS index_id 
-               ON employees(id);
-            """
-        )
+
         #Индексируем колонки first_name, last_name, department в таблице employees для увеличения производительности
         cursor.execute(
-            """CREATE INDEX IF NOT EXISTS index_name_surname_department
-               ON employees(first_name, last_name, department);
+            """
+            CREATE INDEX IF NOT EXISTS index_name_surname
+            ON employees(first_name, last_name);
+            """
+        )
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS index_department
+            ON employees(department);
             """
         )
 
-    def create_employee(id, first_name, last_name, age, department, salary):
-        """
+    def create_employee(id: int, first_name: str, last_name: str, age: int, department: str, salary: Decimal):
+        """#прописать return
         Добавление нового сотрудника в БД
 
         Args:
@@ -52,12 +55,12 @@ try:
             last_name(str): фамилия сотрудника
             age(int): возраст сотрудника
             department(str): подразделение, в котором работает сотрудник
-            salary(int/float): зарплата сотрудника
+            salary(Decimal): зарплата сотрудника
         """
         with connection.cursor() as cursor:
-            keys = 'id, first_name, last_name, age, department, salary'
-            query = f"INSERT INTO employees({keys}) VALUES ({id}, '{first_name}', '{last_name}', {age}, '{department}', {salary});"
+            query = "INSERT INTO employees(id, first_name, last_name, age, department, salary) VALUES (%(int)s, %(str)s, %(str)s, %(int)s, %(str)s, %(Decimal)s);"
             cursor.execute(query, (id, first_name, last_name, age, department, salary))
+
     def get_full_list_employees():
         """
         Печатает список всех сотрудников
@@ -72,9 +75,9 @@ try:
                 FROM employees
                 ORDER BY id;
                 """)
-            print(cursor.fetchall())
-
-    def update_data_employee(id, *new_data):
+            return cursor.fetchall() #добавить флаг,,,
+    get_full_list_employees()
+    def update_data_employee(id: int, *new_data):
         """
         Обновляет данные сотрудника, принимая на вход его id и новые значения вида 'column: value'
 
@@ -93,10 +96,10 @@ try:
             )
             if cursor.fetchone():
                 #Создаем массив, в котором будут списки, состоящие из пар столбец-новое значение
-                new_data = [[pair.split(':')[0].strip(), pair.split(':')[1].strip()] for pair in new_data]
+                new_data = [[pair.split(':')[0].strip(), pair.split(':')[1].strip()] for pair in new_data] #передать dict
                 for i in range(len(new_data)):
-                    update = f"UPDATE employees SET {new_data[i][0]} = '{new_data[i][1]}' WHERE id = {id};"
-                    cursor.execute(update)
+                    update = "UPDATE employees SET '%s' = '%s' WHERE id = %s;"
+                    cursor.execute(update, (new_data[i][0], new_data[i][1]), id)
             else:
                 print("Сотрудника с таким id не существует")
 
@@ -110,15 +113,15 @@ try:
         with connection.cursor() as cursor:
             #Проверка существует ли в БД пользователь с таким id
             cursor.execute(
-               f"""
+                """
                 SELECT id
                 FROM employees
-                WHERE id = {id};
-                """
+                WHERE id = %s;
+                """, id #Error 'int' object does not support indexing
             )
             if cursor.fetchone():
-                delete = f'DELETE FROM employees WHERE id = {id};'
-                cursor.execute(delete)
+                delete = "DELETE FROM employees WHERE id = %s;"
+                return cursor.execute(delete, id)
             else:
                 print("Сотрудника с таким id не существует")
 
@@ -130,17 +133,20 @@ try:
         Args:
             name(str): имя сотрудника
             surname(str): фамилия сотруника
+
+        Returns:
+            список кортежей, в которых содержится информация о сотрудниках с введенными именем и фамилией
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                f"""
+                """
                 SELECT * 
                 FROM employees
-                WHERE first_name = '{name}' 
-                AND last_name = '{surname}';
-                """
+                WHERE first_name = %s 
+                AND last_name = %s;
+                """, (name, surname)
             )
-            print(cursor.fetchall())
+            return cursor.fetchall()
 
     def search_above_average_salary():
         """
@@ -156,13 +162,13 @@ try:
             )
             average_salary = cursor.fetchone()[0]
             cursor.execute(
-                f"""
+                """
                 SELECT *
                 FROM employees
-                WHERE salary > {average_salary};
-                """
+                WHERE salary > %s;
+                """, (average_salary)
             )
-            print(cursor.fetchall())
+            return cursor.fetchall()
 
     def search_by_department(department: str):
         """
@@ -173,13 +179,15 @@ try:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                f"""
+                """
                 SELECT *
                 FROM employees
-                WHERE department = '{department}';
-                """
+                WHERE department = %s;
+                """, (department)
             )
-            print(cursor.fetchall())
+            return cursor.fetchall()
+
+
     #Отправляем объект соединения в пул соединений
     postgresql_pool.putconn(connection)
 
