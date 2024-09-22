@@ -15,7 +15,7 @@ def create_employee(id: int, first_name: str, last_name: str, age: int, departme
         salary(Decimal): зарплата сотрудника
     """
     with connection.cursor() as cursor:
-        query = "INSERT INTO employees(id, first_name, last_name, age, department, salary) VALUES (%s, %s, %s, %s, %s, %s) COMMIT;"
+        query = "INSERT INTO employees(id, first_name, last_name, age, department, salary) VALUES (%s, %s, %s, %s, %s, %s)"
         cursor.execute(query, (id, first_name, last_name, age, department, salary))
         cursor.execute('COMMIT;')
 
