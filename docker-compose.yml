@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  company_db:
+    image: postgres:latest
+    container_name: company_db
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTRGRES_USER=admin
+      - POSTGRES_DB=company_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/run/postgresql/.s.PGSQL.5432

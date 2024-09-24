@@ -1,6 +1,6 @@
-from connection import connection, cursor
+from connection import connection
 
-def search_by_name_and_surname(name: str, surname: str):
+def search_by_name_and_surname(name: str, surname: str) -> [tuple]:
     """
     Выводит информацию о сотруднике по имени и фамилии
 
@@ -23,10 +23,12 @@ def search_by_name_and_surname(name: str, surname: str):
         return cursor.fetchall()
 
 
-def search_above_average_salary():
+def search_above_average_salary() -> [tuple]:
     """
     Выводит информацию о сотрудниках, чья зарплата выше среднего
 
+    Returns:
+        список кортежей, в которых содержится информация о сотрудниках с зарплатой выше среднего
     """
     with connection.cursor() as cursor:
         cursor.execute(
@@ -46,19 +48,23 @@ def search_above_average_salary():
         return cursor.fetchall()
 
 
-def search_by_department(department: str):
+def search_by_department(department: str) -> [tuple]:
     """
     Выводит сотрудников, которые работают в отделе
 
     Args:
         department(str): отдел
+
+    Returns:
+        список кортежей, в которых содержится информация о сотрудниках, работающих в отделе
     """
     with connection.cursor() as cursor:
         cursor.execute(
             f"""
             SELECT *
             FROM employees
-            WHERE department = %s;
+            WHERE department = %s
+            ORDER BY id;
             """, (department,)
         )
         return cursor.fetchall()

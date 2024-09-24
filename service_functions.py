@@ -1,6 +1,27 @@
 from connection import connection
 from decimal import Decimal
+#обернуть в класс
 
+
+def check_if_employee_exists(id: int) -> bool:
+    """
+    Проверяет существует ли в БД сотрудник с таким id
+
+    Args:
+        id(int): id сотрудника
+
+    Returns:
+        bool: True - если сотрудник с таким id существует, иначе False
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+            EXISTS(SELECT 1
+            FROM employees
+            WHERE id = %s);
+            """, (id,)
+        )
+        return cursor.fetchone()[0]
 
 def create_employee(id: int, first_name: str, last_name: str, age: int, department: str, salary: Decimal):
     """
@@ -15,14 +36,20 @@ def create_employee(id: int, first_name: str, last_name: str, age: int, departme
         salary(Decimal): зарплата сотрудника
     """
     with connection.cursor() as cursor:
-        query = "INSERT INTO employees(id, first_name, last_name, age, department, salary) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(query, (id, first_name, last_name, age, department, salary))
-        cursor.execute('COMMIT;')
+        if not(check_if_employee_exists(id)):
+            query = "INSERT INTO employees(id, first_name, last_name, age, department, salary) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(query, (id, first_name, last_name, age, department, salary))
+            connection.commit()
+        #else:
+            #print('Сотрудник с таким id уже существует')
 
-def get_full_list_employees():
+def get_full_list_employees(per_page: int, offset: int) -> [tuple]:
     """
     Печатает список всех сотрудников
 
+    Args:
+        per_page(int): сколько строк вывести
+        offset(int): сколько строк пропустить от начала списка и затем начать выводить строки
     Return:
         list of tuples - список кортежей с данными о сотрудниках
     """
@@ -31,9 +58,10 @@ def get_full_list_employees():
             """ 
             SELECT * 
             FROM employees
-            ORDER BY id;
-            """)
-        return cursor.fetchall()  # можно заменить на fetchmany(), у которого можно указать, сколько строк выводить
+            ORDER BY id
+            LIMIT %s OFFSET %s;
+            """, (per_page, offset,))
+        return cursor.fetchall()
 
 def update_data_employee(id: int, dates: [dict]):
     """
@@ -44,24 +72,15 @@ def update_data_employee(id: int, dates: [dict]):
         dates([dict]): список словарей {'column': 'value'}
     """
     with connection.cursor() as cursor:
-        # Проверка существует ли в БД пользователь с таким id
-        cursor.execute(
-           f"""
-           SELECT id
-           FROM employees
-           WHERE id = %s;
-           """, (id,)
-        )
-        if cursor.fetchone():
+        if check_if_employee_exists(id):
             for data in dates:
                 for key, value in data.items():
                     # Обновление данных
                     update = f"UPDATE employees SET {key} = %s WHERE id = %s"
                     cursor.execute(update, (value, id,))
-                    cursor.execute('COMMIT;')
+                    connection.commit()
         else:
-            print("Сотрудника с таким id не существует")
-
+            print('Сотрудника с таким id не существует')
 
 def delete_employee(id: int):
     """
@@ -71,17 +90,11 @@ def delete_employee(id: int):
         id(int): уникальный id сотрудника
     """
     with connection.cursor() as cursor:
-        # Проверка существует ли в БД пользователь с таким id
-        cursor.execute(
-            f"""
-            SELECT id
-            FROM employees
-            WHERE id = %s;
-            """, (id,)
-        )
-        if cursor.fetchone():
+        if check_if_employee_exists(id):
             delete = "DELETE FROM employees WHERE id = %s;"
             cursor.execute(delete, (id,))
-            cursor.execute('COMMIT;')
+            connection.commit()
         else:
-            print("Сотрудника с таким id не существует")
+            print('Сотрудника с таким id не существует')
+
+
