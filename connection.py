@@ -3,10 +3,10 @@ from psycopg2 import pool
 
 #Подключение к БД после docker-compose
 postgresql_pool = psycopg2.pool.SimpleConnectionPool(1, 20,
-    host = 'localhost',
-    user = 'admin',
+    host = '127.0.0.1',
+    user = 'postgres',
     port = '5432',
-    password = 'root',
+    password = 'zxcvb',
     dbname = 'company_db'
 )
 
