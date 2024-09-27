@@ -4,7 +4,7 @@ class Searches:
     """
     Класс с методами для поиска информации в БД
     """
-    def search_by_name_and_surname(name: str, surname: str) -> [tuple]:
+    def search_by_name_and_surname(self, name: str, surname: str) -> [tuple]:
         """
         Выводит информацию о сотруднике по имени и фамилии
 
@@ -27,7 +27,7 @@ class Searches:
             return cursor.fetchall()
 
 
-    def search_above_average_salary() -> [tuple]:
+    def search_above_average_salary(self) -> [tuple]:
         """
         Выводит информацию о сотрудниках, чья зарплата выше среднего
 
@@ -46,13 +46,14 @@ class Searches:
                 f"""
                 SELECT *
                 FROM employees
-                WHERE salary > %s;
+                WHERE salary > %s
+                ORDER by id;
                 """, (average_salary,)
             )
             return cursor.fetchall()
 
 
-    def search_by_department(department: str) -> [tuple]:
+    def search_by_department(self, department: str) -> [tuple]:
         """
         Выводит сотрудников, которые работают в отделе
 

@@ -27,7 +27,7 @@ class Service_functions:
     """
     Класс с методами для сервисной работы с БД
     """
-    def create_employee(id: int, first_name: str, last_name: str, age: int, department: str, salary: Decimal):
+    def create_employee(self, id: int, first_name: str, last_name: str, age: int, department: str, salary: Decimal):
         """
         Добавление нового сотрудника в БД
 
@@ -47,7 +47,7 @@ class Service_functions:
             #else:
                 #print('Сотрудник с таким id уже существует')
 
-    def get_full_list_employees(per_page: int, offset: int) -> [tuple]:
+    def get_full_list_employees(self, per_page: int, offset: int) -> [tuple]:
         """
         Печатает список всех сотрудников
 
@@ -67,7 +67,7 @@ class Service_functions:
                 """, (per_page, offset,))
             return cursor.fetchall()
 
-    def update_data_employee(id: int, dates: [dict]):
+    def update_data_employee(self, id: int, dates: [dict]):
         """
         Обновляет данные сотрудника, принимая на вход его id и список из словарей {'column': 'value'}
 
@@ -86,7 +86,7 @@ class Service_functions:
             else:
                 print('Сотрудника с таким id не существует')
 
-    def delete_employee(id: int):
+    def delete_employee(self, id: int):
         """
         Удаляет сотрудника из БД по его уникальному id
 

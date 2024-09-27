@@ -1,13 +1,17 @@
-version: '3.5'
+version: '3.8'
 
 services:
-  company_db:
+  db:
     image: postgres:latest
-    container_name: container_company_db
     restart: always
     environment:
-      - POSTGRES_PASSWORD=root
-      - POSTRGRES_USER=admin
-      - POSTGRES_DB=company_db
+      POSTGRES_DB: company_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zxcvb
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
