@@ -1,4 +1,4 @@
-from connection import *
+from connection import postgresql_pool, connection, cursor
 
 def putconn():
     """

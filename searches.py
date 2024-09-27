@@ -43,7 +43,7 @@ class Searches:
             )
             average_salary = list(cursor.fetchone())[0]
             cursor.execute(
-                f"""
+                """
                 SELECT *
                 FROM employees
                 WHERE salary > %s
@@ -65,7 +65,7 @@ class Searches:
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                f"""
+                """
                 SELECT *
                 FROM employees
                 WHERE department = %s
